@@ -1,40 +1,70 @@
+"use strict";
+/*jshint esversion: 6 */
+
+const util = require("./util.js");
+const d3 = require("d3");
+
 // for generating a slideshow panel
 // XXX is gonna need to know about the force layout
 
 function slideshow(metro) {
-  var first = true;
-  var current = 0;
-  var timeology = 1;
-  var focus;
-  var steps = [
-    {id: 0, title: "Visualizing the News through Metro Maps", img:"greece.png", img_attr:"Bloomberg", text: "<p>Suppose that you are trying to understand the Greek credit crisis.  You decide to read articles published by the New York Times on the subject, and discover that while there are a lot of stories, it is often hard to contextualize any given story: there are multiple narratives, interacting with each other to create a complex web of stories.  How do you navigate these stories? Why, with a metro map, of course!  Metro maps are a technique developed by Dafna Shahaf designed to assist in the understanding of story lines that have nontrivial relationships with one another. You can find the code on <a href='https://github.com/ezyang/metromaps'>GitHub.</a></p>"},
-    {id: 1, title: "Greek debt", line:"l0", show: "n9572", img:"austerity.png", img_attr:"Aris Messinis/Agence France-Presse — Getty Images", text: "<p>Each metro line represents distinct story line.  For example, this particular line can be thought of as the main storyline of the Greek credit crisis, starting with statements from Papaconstantinou saying that Greek will control the debt. Focusing on a particular story allows you to read the full text in the right panel.</p>"},
-    {id: 2, title: "Evolution over time", line:"l0", show: "n11072", img:"euofficials.png", img_attr:"Olivier Hoslet/European Pressphoto Agency", text: "<p>Each story on the metroline is also positioned according to the time it occured, so as you travel from left to right, stories unfold. On this line, statements by the government were soon followed up with concrete plans for Greek austerity measures, and so on...  However, a story can be an important component of multiple narratives.  For example, while the austerity measures were an important part of the Greek deficit cutting plan...</p>"},
-    {id: 3, title: "A branching storyline: strikes and riots", line:"l1", show: "n11324", img:"strike.png", img_attr:"Reuters/Stringer", text: "...these measures also sparked protests and strikes. These events, while related to the Greek credit crisis, can be thought to constitute a distinct storyline from governmental policy.  Thus they live on a different metro line, albeit connected at a key story."},
-    {id: 4, title: "Greek Debt Crisis Metromap", img:"acropolis.png", img_attr:"Louisa Gouliamaki/Agence France-Presse — Getty Images", text: "There were many other stories proceeding throughout the crisis, and our visualization is able to display all of this information in a clean and comprehendable format.  Metro maps are not only useful for news, but can be used for many domains of knowledge, including scientific research. We invite you to delve deeper into the Greek credit crisis, using this metro map as your guide."},
+  let first = true;
+  let current = 0;
+  let timeology = 1;
+  let focus;
+  let steps = [
+    {id: 0, title: "Visualizing the News through Metro Maps",
+        img:"greece.png",
+        img_attr:"Bloomberg",
+        text: "<p>Suppose that you are trying to understand the Greek credit crisis.  You decide to read articles published by the New York Times on the subject, and discover that while there are a lot of stories, it is often hard to contextualize any given story: there are multiple narratives, interacting with each other to create a complex web of stories.  How do you navigate these stories? Why, with a metro map, of course!  Metro maps are a technique developed by Dafna Shahaf designed to assist in the understanding of story lines that have nontrivial relationships with one another. You can find the code on <a href='https://github.com/ezyang/metromaps'>GitHub.</a></p>"},
+    {id: 1,
+        title: "Greek debt",
+        line:"l0",
+        show: "n9572",
+        img:"austerity.png",
+        img_attr:"Aris Messinis/Agence France-Presse — Getty Images",
+        text: "<p>Each metro line represents distinct story line.  For example, this particular line can be thought of as the main storyline of the Greek credit crisis, starting with statements from Papaconstantinou saying that Greek will control the debt. Focusing on a particular story allows you to read the full text in the right panel.</p>"},
+    {id: 2, title: "Evolution over time",
+        line:"l0",
+        show: "n11072",
+        img:"euofficials.png",
+        img_attr:"Olivier Hoslet/European Pressphoto Agency",
+        text: "<p>Each story on the metroline is also positioned according to the time it occured, so as you travel from left to right, stories unfold. On this line, statements by the government were soon followed up with concrete plans for Greek austerity measures, and so on...  However, a story can be an important component of multiple narratives.  For example, while the austerity measures were an important part of the Greek deficit cutting plan...</p>"},
+    {id: 3,
+        title: "A branching storyline: strikes and riots",
+        line:"l1",
+        show: "n11324",
+        img:"strike.png",
+        img_attr:"Reuters/Stringer",
+        text: "...these measures also sparked protests and strikes. These events, while related to the Greek credit crisis, can be thought to constitute a distinct storyline from governmental policy.  Thus they live on a different metro line, albeit connected at a key story."},
+    {id: 4,
+        title: "Greek Debt Crisis Metromap",
+        img:"acropolis.png",
+        img_attr:"Louisa Gouliamaki/Agence France-Presse — Getty Images",
+        text: "There were many other stories proceeding throughout the crisis, and our visualization is able to display all of this information in a clean and comprehendable format.  Metro maps are not only useful for news, but can be used for many domains of knowledge, including scientific research. We invite you to delve deeper into the Greek credit crisis, using this metro map as your guide."}
   ];
 
-  var id = fresh("slideshow");
+  let id = fresh("slideshow");
   function showcallback(d) {
     $("#fulltext").empty();
     if (d) {
       d3.html("fulltext/" + d.id.substr(1) + ".html", function(doc) {
         $("#fulltext")
-          .append("<h1>"+d.label+"</h1>")
-          .append("<p>"+d3.time.format("%Y-%m-%d")(d.date)+"</p>")
+          .append("<h1>" + d.label+"</h1>")
+          .append("<p>" + d3.time.format("%Y-%m-%d")(d.date)+"</p>")
           .append(doc);
       });
     }
-  };
+  }
   metro.showcallback(showcallback);
-  var tid = fresh("timeology");
-  var lid = fresh("line");
+  let tid = fresh("timeology");
+  let lid = fresh("line");
   function json_datas(t, l) {
     if (t == 0) {
       return "sample.json";
     } else {
-      if (!l || l == "l0") return "preserving.json";
-      else return l + ".json";
+      if (!l || l == "l0") {return "preserving.json";}
+      else {return l + ".json";}
     }
   }
   function show_data() {
@@ -57,9 +87,9 @@ function slideshow(metro) {
           .insert("div")
           .attr("class", "text")
           .each(function(d) {
-            var div = d3.select(this);
+            let div = d3.select(this);
             if (d.img) {
-              var img_div = div.insert("div").attr("class", "img_div");
+              let img_div = div.insert("div").attr("class", "img_div");
               img_div.insert("img")
                 .attr("src", d.img)
                 .attr("title", d.img_attr);
@@ -67,7 +97,7 @@ function slideshow(metro) {
                 .attr("class", "img_attr")
                 .text(d.img_attr);
             }
-            var text_div = div.insert("div").attr("class", "text_div");
+            let text_div = div.insert("div").attr("class", "text_div");
             div.insert("h2")
               .text(d.title);
             div.jq().append(d.text);
@@ -86,16 +116,16 @@ function slideshow(metro) {
             span.insert("input")
               .attr("type", "radio")
               .attr("name", "tutorial")
-              .attr("id", function(_,i) {return id + i})
-              .attr("value", function(_,i) {return i})
+              .attr("id", function(_,i) {return id + i;})
+              .attr("value", function(_,i) {return i;})
               .on("change", function(d,i) { current = i; redraw(); });
             span.insert("label")
-              .attr("for", function(_,i) {return id + i})
-              .text(function(_,i) {return i+1});
+              .attr("for", function(_,i) {return id + i;})
+              .text(function(_,i) {return i+1;});
           });
         page.select("input[type=radio]")
-          .property("checked", function(_,i) {return i == current});
-        page.exit().remove()
+          .property("checked", function(_,i) {return i == current;});
+        page.exit().remove();
       });
 
     // The next button: [ Next ▸ ]
@@ -111,7 +141,7 @@ function slideshow(metro) {
           })
           .insert("b").text("Next ▸");
         next.attr("disabled", current == steps.length-1 ? "disabled" : null);
-      })
+      });
 
     // jQuery UI to pretty it up
     controls.jq().buttonset();
@@ -133,8 +163,8 @@ function slideshow(metro) {
         span.insert("input")
           .attr("type", "radio")
           .attr("name", "timeology")
-          .attr("id", function(_,i) {return tid + i})
-          .attr("value", function(_,i) {return i})
+          .attr("id", function(_,i) {return tid + i;})
+          .attr("value", function(_,i) {return i;})
           .on("change", function(d,i) {
             if (i != timeology) {
               timeology = i;
@@ -142,12 +172,12 @@ function slideshow(metro) {
             }
           });
         span.insert("label")
-          .attr("for", function(_,i) {return tid + i})
-          .text(function(d) {return d.name});
+          .attr("for", function(_,i) {return tid + i;})
+          .text(function(d) {return d.name;});
       })
       ;
     timecontrols.selectAll("input[type=radio]")
-        .property("checked", function(_,i) {return i == timeology});
+        .property("checked", function(_,i) {return i == timeology;});
     timecontrols.jq().buttonset();
 
     //legend and highlighting for different lines
@@ -165,8 +195,8 @@ function slideshow(metro) {
         span.insert("input")
           .attr("type", "radio")
           .attr("name", "line")
-          .attr("id", function(_,i) {return lid + i})
-          .attr("value", function(_,i) {return i})
+          .attr("id", function(_,i) {return lid + i;})
+          .attr("value", function(_,i) {return i;})
           .on("change", function(d,i) {
             if (focus != d.focus) {
               focus = d.focus;
@@ -174,7 +204,7 @@ function slideshow(metro) {
             }
           });
         span.insert("label")
-          .attr("for", function(_,i) {return lid + i})
+          .attr("for", function(_,i) {return lid + i;})
           .call(function(label) {
             label.insert("svg")
               .attr("id",function(d,_) {return d.svg_id;})
@@ -184,7 +214,7 @@ function slideshow(metro) {
               .attr("y1","7")
               .attr("x2","15")
               .attr("y2","7");
-            label.insert("span").text(function(d) {return d.name});
+            label.insert("span").text(function(d) {return d.name;});
           });
       })
       ;
@@ -208,15 +238,17 @@ function slideshow(metro) {
     }
   }
   my.current = function(v) {
-    if (!arguments.length) return current;
+    if (!arguments.length) {return current;}
     current = v;
     return my;
-  }
+  };
+
   my.steps = function(v) {
-    if (!arguments.length) return steps;
+    if (!arguments.length) {return steps;}
     steps = v;
     return my;
-  }
-  return my;
+  };
+
+  return my;  // todo: does this serve any purpose?
 }
 

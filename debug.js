@@ -1,12 +1,12 @@
 function debugForce(force, selection) {
 
-  var divr = selection.insert('div');
+  let divr = selection.insert('div');
 
-  var divm = divr.insert('span');
-  var div = divr.insert('span');
+  let divm = divr.insert('span');
+  let div = divr.insert('span');
 
   // us specific
-  var modes = divm.insert("span").text(" ");
+  let modes = divm.insert("span").text(" ");
   modes.selectAll(".btn").data([
       {name: "Edit", mode: MetroMode.EDIT},
       {name: "View", mode: MetroMode.VIEW}
@@ -24,7 +24,7 @@ function debugForce(force, selection) {
       });
   modes.jq().buttonset();
 
-  var labeltog = div.insert("input")
+  let labeltog = div.insert("input")
     .attr("type", "checkbox")
     .attr("id", "debuglabeltog")
     .on("change", function() {
@@ -38,7 +38,7 @@ function debugForce(force, selection) {
   div.insert("label").attr("for", "debuglabeltog").text("Labels");
   labeltog.jq().button();
 
-  var play = div.insert("span").text(" ").insert("input")
+  let play = div.insert("span").text(" ").insert("input")
     .attr("type", "checkbox")
     .attr("id", "debugplay")
     .property("checked", !force.paused())
@@ -51,13 +51,13 @@ function debugForce(force, selection) {
   }
   div.insert("label").attr("for", "debugplay").text("Run");
   play.jq().button({ icons: { primary: "ui-icon-pause" }, text: false });
-  var buttons =
+  let buttons =
       [ {name: "Restart",     f: function() { setplay(true);
                                               force.start(); } },
         {name: "Fix all", f: function() { force.nodes().forEach(function(n) {n.fixed = 1;}) } },
         {name: "Clear fixed", f: function() { force.nodes().forEach(function(n) {n.fixed = 0;}) } },
       ]
-  var btns = div.insert("span").text(" ");
+  let btns = div.insert("span").text(" ");
   btns.selectAll(".btn").data(buttons)
     .enter()
     .insert("button")
@@ -67,11 +67,11 @@ function debugForce(force, selection) {
     .each(function() {$(this).button()});
   btns.jq().buttonset();
 
-  var linear =
+  let linear =
       [ {name: "Octilinear", line: octilinear },
         {name: "Hexilinear", line: hexilinear },
       ]
-  var linear_btns = div.insert("span").text(" ");
+  let linear_btns = div.insert("span").text(" ");
   linear_btns.selectAll(".btn").data(linear)
     .enter()
     .insert("span")
@@ -93,7 +93,7 @@ function debugForce(force, selection) {
     return selection.selectAll('.slider').filter(function (d) {return d.alpha});
   }
 
-  var oldalpha = 0.1;
+  let oldalpha = 0.1;
   function neg(f) {
     return function(v) {
       if (!arguments.length) return -f();
@@ -114,7 +114,7 @@ function debugForce(force, selection) {
       return f(v);
     }
   }
-  var sliders =
+  let sliders =
     [ {name: 'Charge',        min: 0, max: 600, step: 1,       f: neg(force.charge)},
       {name: 'Gravity',       min: 0, max: 0.3, step: 0.01,    f: force.gravity},
       {name: 'Friction',      min: 0, max: 1,   step: 0.01,    f: force.friction},
@@ -133,10 +133,10 @@ function debugForce(force, selection) {
         .style('text-align', 'right')
         .style('padding-right', '1em')
         .text(function (d) { return d.name });
-      var readout = tr.insert('td')
+      let readout = tr.insert('td')
         .attr('class', 'readout')
         .text(function (d) { return d.f() });
-      var widgets = tr.insert('td', '.readout')
+      let widgets = tr.insert('td', '.readout')
         .attr('width', '400')
         .insert('div')
         .attr('class', 'slider')
@@ -164,18 +164,18 @@ function debugForce(force, selection) {
     return selection.selectAll('.slider').each(function(d) {$(this).slider({value: d.range ? undefined : d.f(), values: d.range ? d.f() : undefined})});
   }
 
-  var buttons2 =
+  let buttons2 =
       [ {name: "Dump", f: function() { $("#jsonbox").val(JSON.stringify(force.state())); } },
         {name: "Load", f: function() { force.state(JSON.parse($("#jsonbox").val())); force(); force.stop(); updateSliders(); }},
         // US specific
         // XXX kind of user unfriendly at the moment
-        {name: "Copy to LocalStorage", f: function() {  var json = JSON.stringify(force.state())
+        {name: "Copy to LocalStorage", f: function() {  let json = JSON.stringify(force.state())
                                             $("#jsonbox").val(JSON.stringify(force.state()));
                                             localStorage.setItem("state", json)
                                          }},
         {name: "Delete from LocalStorage", f: function() { if (confirm("Are you sure you want to delete?")) { localStorage.setItem("state", null); } }},
       ];
-  var btns2 = selection.insert("div");
+  let btns2 = selection.insert("div");
   btns2.selectAll(".btn").data(buttons2)
     .enter()
     .insert("button")

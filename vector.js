@@ -2,13 +2,13 @@
 // vectors are arrays [x,y] (2-dimensional)
 // I cannae believe D3.js has no vector operations
 
-var octilinear = function() {
-  var x = 1/Math.sqrt(2);
+let octilinear = function() {
+  let x = 1/Math.sqrt(2);
   return [[1,0],[x,x],[0,1],[-x,x],[-1,0],[-x,-x],[0,-1],[x,-x]]
 }();
 
-var hexilinear = function() {
-  var x = Math.sqrt(3)/2;
+let hexilinear = function() {
+  let x = Math.sqrt(3)/2;
   return [[1,0],[1/2,x],[-1/2,x],[-1,0],[-1/2,-x],[1/2,-x]]
 }();
 
@@ -32,7 +32,7 @@ function vec2(p1,p2) { // {x:R, y:R} -> {x:R, y:R} -> V (from p1 to p2)
   return [p2.x-p1.x, p2.y-p1.y];
 }
 function maxr(as, f) { // returns the value that is max by f (not f(v))
-  var m = as[0], fm = f(as[0]);
-  as.forEach(function(a) {var fa = f(a); if (fa > fm) {m = a; fm = fa}});
+  let m = as[0], fm = f(as[0]);
+  as.forEach(function(a) {let fa = f(a); if (fa > fm) {m = a; fm = fa}});
   return m;
 }

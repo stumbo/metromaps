@@ -2,12 +2,12 @@
  * For development purposes, metro maps are modal.  For
  * normal use, VIEW is the mode
  */
-var MetroMode = {
+let MetroMode = {
     EDIT: 0, // internal use only (drag behaviors turned on)
     VIEW: 1, // user viewable (clicks open more information about stations)
 }
 
-var NodeType = {
+let NodeType = {
     PLAIN: 0,       // plain old node, probably is a plain old intersection or single path node
     DUMMY: 1,       // fake station to allow for bending on a line
 }
@@ -116,18 +116,18 @@ var NodeType = {
  */
 function metromap(container, debug) {
 
-  var margin = {top: 0, right: 70, bottom: 20, left: 70};
+  let margin = {top: 0, right: 70, bottom: 20, left: 70};
 
   // We need to generate fresh IDs for dummy nodes we create;
   // furthermore, this information must be persisted across
   // getState/setState, since more dummy nodes may be created later.
-  var dummyid = 0;
+  let dummyid = 0;
 
-  var realsvg = container.append("svg"),
+  let realsvg = container.append("svg"),
       axis = realsvg.append("g").attr("class", "axis"),
       svg = realsvg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  var force = d3.layout.force() // some defaults (they're not very good ;-)
+  let force = d3.layout.force() // some defaults (they're not very good ;-)
     .charge(-100)
     .gravity(0.05)
     .linkStrength(1)
@@ -136,26 +136,26 @@ function metromap(container, debug) {
 
   // width and height of the text labels; it's OK if they're a little
   // higher than necessary but that can interfere with click hitboxes
-  var capWidth = 130,
+  let capWidth = 130,
       capHeight = 64;
 
   // called when my.show() is invoked; useful because clicks can result in
   // show invocations
-  var showcallback = function() {};
-  var directions = octilinear;
+  let showcallback = function() {};
+  let directions = octilinear;
 
-  var color             = d3.scale.category10(),
+  let color             = d3.scale.category10(),
       mode              = MetroMode.EDIT,
       lines             = [];
 
   // the ranges of these scales are controlled by 'octoforce', 'monoforce'
   // and 'timeforce'
-  var octoscale = d3.scale.linear().domain([0.1,0]).range([0,0]);
-  var monoscale = d3.scale.linear().domain([0.1,0]).range([0,0]);
-  var timescale = d3.scale.linear().domain([0.1,0]).range([0,0]);
+  let octoscale = d3.scale.linear().domain([0.1,0]).range([0,0]);
+  let monoscale = d3.scale.linear().domain([0.1,0]).range([0,0]);
+  let timescale = d3.scale.linear().domain([0.1,0]).range([0,0]);
 
   // scale for mapping times to x coordinate positions
-  var timelate = d3.time.scale();
+  let timelate = d3.time.scale();
 
   function redraw(dur) {
     if (arguments.length < 1) dur = 0;
@@ -178,7 +178,7 @@ function metromap(container, debug) {
     // XXX This doesn't work right if the polyline point mapping has
     // changed (dummy nodes were added or removed).  Doing this properly
     // is effort.
-    var line = d3.svg.line().x(function(d) {return d.x}).y(function(d) {return d.y});
+    let line = d3.svg.line().x(function(d) {return d.x}).y(function(d) {return d.y});
     svg.selectAll(".metroline")
       .transition().duration(dur)
       .attr("d", function(l) { return line(l.nodes); })
@@ -189,7 +189,7 @@ function metromap(container, debug) {
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
       .style("opacity", function(d) { return d.unfocus ? 0 : 1 })
       .each(function(d) {
-        var fo = d3.select(this).selectAll(".fo");
+        let fo = d3.select(this).selectAll(".fo");
         fo.transition().duration(dur)
           .attr("x", d.textoffset ? d.textoffset[0] : 0)
           .attr("y", d.textoffset ? d.textoffset[1] : 0);
@@ -213,15 +213,15 @@ function metromap(container, debug) {
       }
     }
   }
-  var onlyView = mkOnly(MetroMode.VIEW);
-  var onlyEdit = mkOnly(MetroMode.EDIT);
+  let onlyView = mkOnly(MetroMode.VIEW);
+  let onlyEdit = mkOnly(MetroMode.EDIT);
   function viewEdit(view, edit) {
     return function() {
       return (mode == MetroMode.VIEW ? view : edit).apply(this, arguments);
     }
   }
 
-  var dummySelector = svg.insert("circle")
+  let dummySelector = svg.insert("circle")
     .attr("class", "dummySelector")
     .attr("r", 4)
     .attr("fill", "#000")
@@ -230,8 +230,8 @@ function metromap(container, debug) {
 
   // custom implementation of dragging
   function dragmove(d) {
-    var dx = d3.event.x - d.px;
-    var dy = d3.event.y - d.py;
+    let dx = d3.event.x - d.px;
+    let dy = d3.event.y - d.py;
     if (d.fixed & 1) {
       force.nodes().forEach(function(node) {
         if (node.fixed & 1) {
@@ -254,7 +254,7 @@ function metromap(container, debug) {
   }
   // Cribbed from the original drag source, but with onlyEdit sprayed
   // on all of the handlers
-  var drag = d3.behavior.drag()
+  let drag = d3.behavior.drag()
         .origin(function(d) {return d})
         .on("dragstart", onlyEdit(function(d) {d.fixed |= 2}))
         .on("drag", onlyEdit(dragmove))
@@ -270,57 +270,57 @@ function metromap(container, debug) {
     // try to make sure the metro lines have consistent time topology
     // note that this can fairly easily be overridden by the
     // octilinearity constraint
-    var k = monoscale(e.alpha);
+    let k = monoscale(e.alpha);
     lines.forEach(function(l) {
-      var i;
+      let i;
       for (i = 0; i < l.nodes.length - 1; i++) {
-        var begin = l.nodes[i];
-        var end = l.nodes[i+1];
+        let begin = l.nodes[i];
+        let end = l.nodes[i+1];
         if (begin.x > end.x) {
-          var delta = begin.x - end.x;
+          let delta = begin.x - end.x;
           begin.x -= delta/2 * k;
           end.x += delta/2 * k;
         }
         if (begin.y > end.y) {
-          var delta = begin.y - end.y;
+          let delta = begin.y - end.y;
           begin.y -= delta/2 * k;
           end.y += delta/2 * k;
         }
       }
     });
-    var k = timescale(e.alpha);
+    k = timescale(e.alpha);
     // another way of doing it: try to enforce "time boundaries"
     force.nodes().forEach(function(node) {
       if (node.type == NodeType.DUMMY) return;
-      var dx = node.x - timelate(node.date);
+      let dx = node.x - timelate(node.date);
       node.x -= dx * k;
     });
     // enforce octilinearity (hard constraint)
-    var k = octoscale(e.alpha);
+    k = octoscale(e.alpha);
     force.links().forEach(function(link) {
       // discover the closest octilinear direction (dir is
       // the orthonormal vector for that direction), and then
       // calculate the new link by rotating around the centroid
       // to align with that direction.)
-      var v = vec2(link.source, link.target);
+      let v = vec2(link.source, link.target);
       // XXX how to stop overlapping?  nudging the edge too far is
       // not stable...
       // XXX this should respect friction
-      var dir = maxr(directions, function(x) {return dot(x,v)});
+      let dir = maxr(directions, function(x) {return dot(x,v)});
       // XXX refactor me, extra lines for handling 'fixed' nodes
       if (link.source.fixed & 1) {
-        var center = vec(link.source);
-        var ray = scale(norm(v), dir);
+        let center = vec(link.source);
+        let ray = scale(norm(v), dir);
         link.target.x += (center[0] + ray[0] - link.target.x) * k;
         link.target.y += (center[1] + ray[1] - link.target.y) * k;
       } else if (link.target.fixed & 1) {
-        var center = vec(link.target);
-        var ray = scale(norm(v), dir);
+        let center = vec(link.target);
+        let ray = scale(norm(v), dir);
         link.source.x += (center[0] - ray[0] - link.source.x) * k;
         link.source.y += (center[1] - ray[1] - link.source.y) * k;
       } else {
-        var center = centroid([vec(link.source), vec(link.target)]);
-        var ray = scale(norm(v)/2, dir);
+        let center = centroid([vec(link.source), vec(link.target)]);
+        let ray = scale(norm(v)/2, dir);
         link.source.x += (center[0] - ray[0] - link.source.x) * k;
         link.source.y += (center[1] - ray[1] - link.source.y) * k;
         link.target.x += (center[0] + ray[0] - link.target.x) * k;
@@ -340,10 +340,10 @@ function metromap(container, debug) {
               .tickFormat(d3.time.format('%b %Y'))
             );
 
-    var cdata = svg.selectAll(".circle")
+    let cdata = svg.selectAll(".circle")
       .data(force.nodes());
     cdata.exit().remove();
-    var circle = cdata.enter()
+    let circle = cdata.enter()
       .insert("circle", ".dummySelector")
       .attr("class", "circle")
       .attr("cx", function(d) { return d.x; })
@@ -360,8 +360,8 @@ function metromap(container, debug) {
           // do-se-do
           // XXX I'm not convinced this works when multiple edges are
           // involved
-          var dlinks = d.edges.values()[0];
-          var n = dlinks[0].target;
+          let dlinks = d.edges.values()[0];
+          let n = dlinks[0].target;
           dlinks[0].target = dlinks[1].target;
           // not necessary, since it will just get deleted
           //dlinks[1].source = dlinks[0].source;
@@ -390,13 +390,13 @@ function metromap(container, debug) {
       .style("display", mode == MetroMode.EDIT ? "inherit" : "none");
 
     function moveSelector(d) {
-      var coords = d3.mouse(svg.node());
+      let coords = d3.mouse(svg.node());
       // XXX todo snap to coordinates of true line
       dummySelector.style("visibility", "visible")
         .attr("cx", coords[0])
         .attr("cy", coords[1]);
     }
-    var ldata = svg.selectAll(".line")
+    let ldata = svg.selectAll(".line")
       .data(force.links());
     ldata.exit().remove();
     ldata.enter()
@@ -413,10 +413,10 @@ function metromap(container, debug) {
       // XXX bleh names: s/d/l/ or something
       .on("click", onlyEdit(function(d) {
         // alright, time to dick around with some node insertion
-        var coords = d3.mouse(svg.node());
-        var n = {id: "dummy" + dummyid, x: coords[0], y: coords[1], type: NodeType.DUMMY, edges: d3.map()}
+        let coords = d3.mouse(svg.node());
+        let n = {id: "dummy" + dummyid, x: coords[0], y: coords[1], type: NodeType.DUMMY, edges: d3.map()}
         // XXX length of the resulting links should be adjusted
-        var l = {id: "dummy" + dummyid, source: n, target: d.target, path: d.path}
+        let l = {id: "dummy" + dummyid, source: n, target: d.target, path: d.path}
         dummyid++;
         d.path.forEach(function(p) {
           n.edges.set(p.id, [d, l]);
@@ -429,7 +429,7 @@ function metromap(container, debug) {
         d.target = n;
         // need to update affected lines too
         d.path.forEach(function(line) {
-          var i = line.nodes.indexOf(d.source);
+          let i = line.nodes.indexOf(d.source);
           if (line.nodes[i+1] == l.target) {
             line.nodes.splice(i+1, 0, n);
           } else {
@@ -454,7 +454,7 @@ function metromap(container, debug) {
       // pick some nice stroke rounding algo
       .style("fill", "none");
 
-    var textdiv = svg.selectAll(".metrotext")
+    let textdiv = svg.selectAll(".metrotext")
       .data(force.nodes())
       .enter()
       .insert("g")
@@ -474,7 +474,7 @@ function metromap(container, debug) {
       .call(debug ? d3.behavior.drag()
               .on("dragstart", onlyEdit(function (d) { d.fixed |= 2; }))
               .on("drag", onlyEdit(function(d) {
-                var el = d3.select(this);
+                let el = d3.select(this);
                 if (!d.textoffset) d.textoffset = [0,0];
                 if (!d3.event.sourceEvent.shiftKey) {
                   d.textoffset[0] += d3.event.dx;
@@ -518,7 +518,7 @@ function metromap(container, debug) {
   // chaining return our closure, not the original
   function rm(f) {
     return function() {
-      var r = f.apply(this, arguments);
+      let r = f.apply(this, arguments);
       return arguments.length ? my : r;
     }
   }
@@ -541,8 +541,8 @@ function metromap(container, debug) {
   // XXX dynamic resizing doesn't really work
   my.size = function(v) {
     if (!arguments.length) return force.size();
-    var width = v[0];
-    var height = v[1];
+    let width = v[0];
+    let height = v[1];
     realsvg.attr("width", v[0]);
     realsvg.attr("height", v[1]);
     axis.attr("transform", "translate(" + margin.left + "," + (height - margin.bottom) + ")");
@@ -557,7 +557,7 @@ function metromap(container, debug) {
   my.start = rm(force.start);
   my.resume = rm(force.resume);
   my.paused = rm(force.paused);
-  var oldPaused;
+  let oldPaused;
   my.mode = function(v) {
     if (!arguments.length) return mode;
     mode = v;
@@ -615,9 +615,9 @@ function metromap(container, debug) {
   }
   function setState(st) {
     if (!st) return;
-    var nodemap = d3.map();
-    var linemap = d3.map();
-    var linkmap = d3.map();
+    let nodemap = d3.map();
+    let linemap = d3.map();
+    let linkmap = d3.map();
     st.nodes.forEach(function(v) {
       v.date = new Date(v.date); 
       // ezyang: I think this is probably wrong...
@@ -632,7 +632,7 @@ function metromap(container, debug) {
     function unid(map) {return function(v) {return map.get(v)}}
     // recompute links and maps
     nodemap.forEach(function(_,x) {
-      var edges = d3.map();
+      let edges = d3.map();
       if (x.edges) {
         x.edges.forEach(function(kv) {
           edges.set(kv.key, kv.value.map(unid(linkmap)));
